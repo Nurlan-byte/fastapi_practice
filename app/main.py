@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from random import randrange
 import psycopg
 from psycopg.rows import dict_row
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from . import models
 from .database import Base, engine, get_db
@@ -13,7 +14,10 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 try:
-    conn = psycopg.connect("host=localhost dbname=fastapi user=postgres password=hzmoipas", row_factory=dict_row)
+    conn = psycopg.connect(
+        "host=localhost dbname=fastapi user=postgres password=hzmoipas",
+        row_factory=dict_row
+        )
     cursor = conn.cursor()
     print("Database connection was succesfull")
 except Exception as error:
@@ -27,12 +31,17 @@ async def root(): #async  опционально
 
 @app.get("/sqlalchemy")
 def test_posts(db:Session = Depends(get_db)):
-    return {'status': "success"}
+    
+    posts = db.scalars(select(models.Post)).all()
+    print(posts)
+    return {"data": posts}
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute("""SELECT * FROM posts""")
-    posts = cursor.fetchall()
+def get_posts(db: Session = Depends(get_db)):
+    posts = db.scalars(select(models.Post)).all()
+    
+    # cursor.execute("""SELECT * FROM posts""")
+    # posts = cursor.fetchall()
     return {"data": posts}
 
 
@@ -58,14 +67,19 @@ def find_index_post(id):
             return i
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(new_post: Post):
+def create_posts(new_post: Post, db: Session = Depends(get_db)):
     # cursor.execute(f" INSERT INTO posts (title, content, published) VALUES ({new_post.title, new_post.content, mew_post.published}) " Так делать не стоит. Это создает уязвимость для SQL иньекций
-    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) 
-                   RETURNING *  """,
-                            (new_post.title, new_post.content, new_post.published))
-    post = cursor.fetchone()
-    conn.commit()
-    return {"data": post}
+    # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) 
+    #                RETURNING *  """,
+    #                         (new_post.title, new_post.content, new_post.published))
+    # post = cursor.fetchone()
+    # conn.commit()
+    print(new_post.model_dump())
+    post = models.Post(**new_post.model_dump())
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return {'data': post}
 
 @app.get("/posts/latest")
 def get_latest_post():
@@ -73,9 +87,11 @@ def get_latest_post():
     return {"detail": post}
 
 @app.get("/posts/{id}")
-def get_post(id: int, response: Response):
-    cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (id,))
-    post = cursor.fetchone()
+def get_post(id: int, response: Response, db: Session = Depends(get_db)):
+    # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (id,))
+    # post = cursor.fetchone()
+    
+    post = db.get(models.Post, id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with id: {id} was not found")
@@ -83,23 +99,34 @@ def get_post(id: int, response: Response):
 
 
 @app.delete("/posts/{id}",  status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int):
+def delete_post(id: int, db: Session = Depends(get_db)):
     
-    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (id,))
-    post = cursor.fetchone()
-    conn.commit()
+    # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (id,))
+    # post = cursor.fetchone()
+    # conn.commit()
+    post = db.get(models.Post, id)
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
+    db.delete(post)
+    db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post):
-    cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
-                (post.title, post.content, post.published, id))
+def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
+    # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
+    #             (post.title, post.content, post.published, id))
     
-    result = cursor.fetchone()
-    if result == None:
+    # result = cursor.fetchone()
+    post = db.get(models.Post, id)
+    
+    if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
-    conn.commit()
-    return {'data': result}
+
+    allowed_fields = {"title", "content", "published"}
+    
+    for key, value in updated_post.model_dump().items():
+        if key in allowed_fields:
+            setattr(post, key, value)
+    db.commit()
+    return {'data': updated_post}
 
