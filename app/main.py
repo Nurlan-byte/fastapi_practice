@@ -1,12 +1,16 @@
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
 from random import randrange
 import psycopg
 from psycopg.rows import dict_row
-import time
+from sqlalchemy.orm import Session
+from . import models
+from .database import Base, engine, get_db
+
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
 
 try:
     conn = psycopg.connect("host=localhost dbname=fastapi user=postgres password=hzmoipas", row_factory=dict_row)
@@ -20,6 +24,10 @@ except Exception as error:
 @app.get("/") # get это один из методов HTTP, / это путь от наччального адреса например от http://127.0.0.1:8000 и это ожно и тоже с http://127.0.0.1:8000/
 async def root(): #async  опционально 
     return {"message": "Hello World"} #формат json
+
+@app.get("/sqlalchemy")
+def test_posts(db:Session = Depends(get_db)):
+    return {'status': "success"}
 
 @app.get("/posts")
 def get_posts():
