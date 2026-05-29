@@ -9,7 +9,7 @@ class Post(Base):
     __tablename__ = "posts"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(200))
+    title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
     published: Mapped[bool] = mapped_column(
         default=True,
@@ -20,3 +20,12 @@ class Post(Base):
         server_default=text("now()"),
         nullable=False
     )    
+    
+    
+class User(Base):
+    __tablename__ = "users"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    password: Mapped[str] = mapped_column(String(255))
+    
