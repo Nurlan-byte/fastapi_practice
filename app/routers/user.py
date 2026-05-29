@@ -4,14 +4,17 @@ from sqlalchemy.orm import Session
 from .. import models, schemas, utils
 from ..database import get_db
 
-router = APIRouter()
+router = APIRouter(
+    prefix = "/users",
+    tags = ["Users"]
+)
 
-@router.get("/users", response_model=list[schemas.UserOut])
+@router.get("/", response_model=list[schemas.UserOut])
 def all_users(db: Session = Depends(get_db)):
     result = db.scalars(select(models.User)).all()
     return result
 
-@router.get("/users/{id}", response_model=schemas.UserOut)
+@router.get("/{id}", response_model=schemas.UserOut)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.get(models.User, id)
     if not user:
@@ -19,7 +22,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
                             detail=f'User with id: {id} does not exist')
     return user
 
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(new_user: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = utils.hash(new_user.password)
     new_user.password = hashed_password

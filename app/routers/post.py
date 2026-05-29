@@ -4,10 +4,13 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 
-router = APIRouter()
+router = APIRouter(
+    prefix = "/posts",
+    tags = ["Posts"]
+)
 
 
-@router.get("/posts", response_model=list[schemas.PostOut])
+@router.get("/", response_model=list[schemas.PostOut])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.scalars(select(models.Post)).all()
     
@@ -31,7 +34,7 @@ def get_posts(db: Session = Depends(get_db)):
 #         if p['id'] == id:
 #             return i
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
 def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(f" INSERT INTO posts (title, content, published) VALUES ({new_post.title, new_post.content, mew_post.published}) " Так делать не стоит. Это создает уязвимость для SQL иньекций
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) 
@@ -51,7 +54,7 @@ def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
 #     post = my_posts[-1]
 #     return {"detail": post}
 
-@router.get("/posts/{id}", response_model=schemas.PostOut)
+@router.get("/{id}", response_model=schemas.PostOut)
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (id,))
     # post = cursor.fetchone()
@@ -63,7 +66,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     return post
 
 
-@router.delete("/posts/{id}",  status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}",  status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
     
     # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (id,))
@@ -76,7 +79,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.put("/posts/{id}", response_model=schemas.PostOut)
+@router.put("/{id}", response_model=schemas.PostOut)
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
     #             (post.title, post.content, post.published, id))

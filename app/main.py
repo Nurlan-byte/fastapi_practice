@@ -1,13 +1,8 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends
-from pydantic import BaseModel
-from random import randrange
+from fastapi import FastAPI
 import psycopg
 from psycopg.rows import dict_row
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-from . import models, schemas, utils
-from .database import Base, engine, get_db
-from .routers import post, user
+from .database import Base, engine
+from .routers import post, user, auth
 
 
 Base.metadata.create_all(bind=engine)
@@ -27,6 +22,7 @@ except Exception as error:
 
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 @app.get("/") # get это один из методов HTTP, / это путь от наччального адреса например от http://127.0.0.1:8000 и это ожно и тоже с http://127.0.0.1:8000/
 async def root(): #async  опционально 
