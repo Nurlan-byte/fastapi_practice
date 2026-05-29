@@ -17,8 +17,14 @@ class PostOut(PostBase):
     
 class UserBase(BaseModel):
     email: EmailStr
-    password: str
     
 class UserCreate(UserBase):
-    pass
+    password: str
+
+class UserOut(UserBase):
+    id: int
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+    
     
