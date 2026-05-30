@@ -27,7 +27,13 @@ class UserOut(UserBase):
     
     model_config = ConfigDict(from_attributes=True)
 
-
 class UserLogin(UserBase):
     password: str
-    
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str    
+
+class TokenData(BaseModel):
+    id: str | None
+    created_at: datetime
