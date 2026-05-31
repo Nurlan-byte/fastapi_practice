@@ -1,7 +1,7 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from .. import models, schemas
+from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(
@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[schemas.PostOut])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     posts = db.scalars(select(models.Post)).all()
     
     # cursor.execute("""SELECT * FROM posts""")
@@ -35,14 +35,14 @@ def get_posts(db: Session = Depends(get_db)):
 #             return i
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
-def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute(f" INSERT INTO posts (title, content, published) VALUES ({new_post.title, new_post.content, mew_post.published}) " Так делать не стоит. Это создает уязвимость для SQL иньекций
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) 
     #                RETURNING *  """,
     #                         (new_post.title, new_post.content, new_post.published))
     # post = cursor.fetchone()
     # conn.commit()
-        
+    
     post = models.Post(**new_post.model_dump())
     db.add(post)
     db.commit()
@@ -55,7 +55,7 @@ def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
 #     return {"detail": post}
 
 @router.get("/{id}", response_model=schemas.PostOut)
-def get_post(id: int, response: Response, db: Session = Depends(get_db)):
+def get_post(id: int, response: Response, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (id,))
     # post = cursor.fetchone()
     
@@ -67,7 +67,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}",  status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     
     # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (id,))
     # post = cursor.fetchone()
@@ -80,7 +80,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}", response_model=schemas.PostOut)
-def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
     #             (post.title, post.content, post.published, id))
     
