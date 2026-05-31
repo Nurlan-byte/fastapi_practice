@@ -9,16 +9,16 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-try:
-    conn = psycopg.connect(
-        "host=localhost dbname=fastapi user=postgres password=hzmoipas",
-        row_factory=dict_row
-        )
-    cursor = conn.cursor()
-    print("Database connection was succesfull")
-except Exception as error:
-    print("Connecting to database failed")
-    print("Error: ", error)
+# try:
+#     conn = psycopg.connect(
+#         "host=localhost dbname=fastapi user=postgres password=hzmoipas",
+#         row_factory=dict_row
+#         )
+#     cursor = conn.cursor()
+#     print("Database connection was succesfull")
+# except Exception as error:
+#     print("Connecting to database failed")
+#     print("Error: ", error)
 
 app.include_router(post.router)
 app.include_router(user.router)
