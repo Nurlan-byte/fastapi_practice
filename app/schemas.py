@@ -12,6 +12,7 @@ class PostCreate(PostBase):
 class PostOut(PostBase):
     id: int
     created_at: datetime
+    user_id: int
     
     model_config = ConfigDict(from_attributes=True)
     

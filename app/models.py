@@ -1,10 +1,9 @@
 from .database import Base
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text 
 from datetime import datetime
-
 class Post(Base):
     __tablename__ = "posts"
     
@@ -20,6 +19,7 @@ class Post(Base):
         server_default=text("now()"),
         nullable=False
     )    
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     
     
 class User(Base):
@@ -33,4 +33,3 @@ class User(Base):
         server_default=text("now()"),
         nullable=False
     )    
-    

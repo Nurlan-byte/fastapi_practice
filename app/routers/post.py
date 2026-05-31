@@ -43,7 +43,7 @@ def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db), cu
     # post = cursor.fetchone()
     # conn.commit()
     
-    post = models.Post(**new_post.model_dump())
+    post = models.Post(user_id = current_user.id, **new_post.model_dump())
     db.add(post)
     db.commit()
     db.refresh(post)
@@ -75,6 +75,10 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
     post = db.get(models.Post, id)
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
+    
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
+    
     db.delete(post)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -89,7 +93,10 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
-
+    
+    if current_user.id != post.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform request action")
+    
     allowed_fields = {"title", "content", "published"}
     
     for key, value in updated_post.model_dump().items():
