@@ -20,6 +20,12 @@ class PostOut(PostBase):
     user: UserOut
 
     model_config = ConfigDict(from_attributes=True)
+    
+class PostVoteOut(BaseModel):
+    Post: PostOut
+    votes: int
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBase(BaseModel):
