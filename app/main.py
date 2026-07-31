@@ -38,5 +38,5 @@ app.include_router(vote.router)
 
 @app.get("/") # get это один из методов HTTP, / это путь от наччального адреса например от http://127.0.0.1:8000 и это ожно и тоже с http://127.0.0.1:8000/
 async def root(): #async  опционально 
-    return {"message": "Hello World!!!!"} #формат json
+    return {"message": "Hello World"} #формат json
 

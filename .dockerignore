@@ -1,0 +1,51 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+
+# Database files
+*.sqlite3
+*.db
+
+# Docker files (если не нужны внутри образа)
+docker-compose.yml
+
+# Node (если есть frontend)
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
