@@ -13,10 +13,10 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
     user = db.scalars(select(models.User).where(models.User.email == user_credentials.username)).one_or_none()
     
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
     
     if not utils.verify(user_credentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
     
     #create a token
     #return token

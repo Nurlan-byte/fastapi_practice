@@ -5,7 +5,7 @@ from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(
-    prefix="/votes", 
+    prefix="/vote", 
     tags=["Votes"]
 )
 
