@@ -2,15 +2,15 @@ name: Build and Deploy Code
 
 on: [push, pull_request]
 
-environment:
-  name: test
-env:
-  DATABASE_URL: ${{secrets.DATABASE_URL}}
-  SECRET_KEY: ${{secrets.SECRET_KEY}}
-  ALGORITHM: ${{secrets.ALGORITHM}}
-  ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
 jobs:
   job1:
+    environment:
+      name: test
+    env:
+      DATABASE_URL: ${{secrets.DATABASE_URL}}
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+      ALGORITHM: ${{secrets.ALGORITHM}}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
 
     services:
       postgres:
