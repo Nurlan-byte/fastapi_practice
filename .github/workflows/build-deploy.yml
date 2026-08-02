@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: pulling git repo 
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
       - name: say hi to the world
         run: echo "hello world"
