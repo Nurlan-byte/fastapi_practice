@@ -2,8 +2,23 @@ name: Build and Deploy Code
 
 on: [push, pull_request]
 
+environment:
+  name: test
+env:
+  DATABASE_URL: ${{secrets.DATABASE_URL}}
+  SECRET_KEY: ${{secrets.SECRET_KEY}}
+  ALGORITHM: ${{secrets.ALGORITHM}}
+  ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
 jobs:
   job1:
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
+
     runs-on: ubuntu-latest
     steps:
       - name: pulling git repo 
