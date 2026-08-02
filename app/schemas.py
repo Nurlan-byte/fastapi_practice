@@ -13,20 +13,6 @@ class PostCreate(PostBase):
     pass
 
 
-class PostOut(PostBase):
-    id: int
-    created_at: datetime
-    user_id: int
-    user: UserOut
-
-    model_config = ConfigDict(from_attributes=True)
-    
-class PostVoteOut(BaseModel):
-    Post: PostOut
-    votes: int
-    
-    model_config = ConfigDict(from_attributes=True)
-
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -40,6 +26,23 @@ class UserOut(UserBase):
     id: int
     created_at: datetime
 
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PostOut(PostBase):
+    id: int
+    created_at: datetime
+    user_id: int
+    user: UserOut
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+    
+class PostVoteOut(BaseModel):
+    Post: PostOut
+    votes: int
+    
     model_config = ConfigDict(from_attributes=True)
 
 
