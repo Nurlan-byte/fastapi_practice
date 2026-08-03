@@ -10,7 +10,7 @@ services:
     # env_file:
     #   - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL_DOCKER=${DATABASE_URL_DOCKER}
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=${ALGORITHM}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
