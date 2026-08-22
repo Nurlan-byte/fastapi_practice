@@ -24,3 +24,15 @@ pytest                                             # tests
 Swagger UI at http://127.0.0.1:8000/docs lists every endpoint and lets you call
 them. Login is sent as `form-data`, not JSON, with the email in the `username`
 field.
+
+## Known limitations
+
+Decisions I would make differently today, left in place rather than retrofitted:
+
+- Synchronous SQLAlchemy throughout; no service layer, so business logic and
+  queries sit in the routers.
+- `HTTPException` raised directly in routers — no domain exception hierarchy.
+- Each endpoint manages its own transaction instead of a single commit at the
+  request boundary.
+- Duplicates caught by an `if exists()` pre-check, which leaves a race window,
+  rather than by handling `IntegrityError`.
