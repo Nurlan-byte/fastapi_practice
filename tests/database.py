@@ -1,33 +1,14 @@
-
-from fastapi.testclient import TestClient
 import pytest
-from app.main import app
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database import get_db, Base
 
+from app.database import Base, get_db, settings
+from app.main import app
 
-engine = create_engine("postgresql://postgres:password123@localhost:5432/fastapi_test")
+engine = create_engine(settings.database_url + "_test")
 
 TestingSessionLocal = sessionmaker(engine, autoflush=False)
-
-
-
-# class Base(DeclarativeBase):
-#     pass
-
-
-# def overrides_get_db():
-#     db = TestingSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-# app.dependency_overrides[get_db] = overrides_get_db
-
-
-
 
 
 @pytest.fixture(scope="function")
@@ -40,6 +21,7 @@ def session():
     finally:
         db.close()
 
+
 @pytest.fixture(scope="function")
 def client(session):
     def overrides_get_db():
@@ -47,11 +29,6 @@ def client(session):
             yield session
         finally:
             session.close()
-    
-    
+
     app.dependency_overrides[get_db] = overrides_get_db
-    #run our code before we run our test
-    # Base.metadata.drop_all(bind=engine)
-    # Base.metadata.create_all(bind=engine)
     yield TestClient(app)
-    #run our code after our test finishes

@@ -1,9 +1,8 @@
-from itertools import count
-
-from fastapi import Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy import select, func
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from .. import models, schemas, oauth2
+
+from .. import models, oauth2, schemas
 from ..database import get_db
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
@@ -19,16 +18,19 @@ def get_posts(
 ):
     # posts = db.scalars(select(models.Post)).all()
 
-    results = (
-        db.execute(select(models.Post, func.count(models.Vote.post_id).label("votes"))
+    results = db.execute(
+        select(models.Post, func.count(models.Vote.post_id).label("votes"))
         .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
-        .group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip)).all()
-    )
-    
+        .group_by(models.Post.id)
+        .filter(models.Post.title.contains(search))
+        .limit(limit)
+        .offset(skip)
+    ).all()
 
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
     return results
+
 
 # my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1},
 #             {"title": "favorite foods", "content": "i like pizza", "id": 2}]
@@ -82,12 +84,13 @@ def get_post(
     # post = cursor.fetchone()
 
     # post = db.get(models.Post, id)
-    
-    post = (
-        db.execute(select(models.Post, func.count(models.Vote.post_id).label("votes"))
+
+    post = db.execute(
+        select(models.Post, func.count(models.Vote.post_id).label("votes"))
         .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
-        .group_by(models.Post.id).filter(models.Post.id == id)).first()
-    )
+        .group_by(models.Post.id)
+        .filter(models.Post.id == id)
+    ).first()
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -116,7 +119,7 @@ def delete_post(
     if post.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Not authorized to perform requested action",
+            detail="Not authorized to perform requested action",
         )
 
     db.delete(post)

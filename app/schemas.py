@@ -1,6 +1,7 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
 from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class PostBase(BaseModel):
@@ -11,7 +12,6 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase):
     pass
-
 
 
 class UserBase(BaseModel):
@@ -38,11 +38,10 @@ class PostOut(PostBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-    
 class PostVoteOut(BaseModel):
     Post: PostOut
     votes: int
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -56,8 +55,8 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: int | None
-    
+    id: int | None = None
+
 
 class Vote(BaseModel):
     post_id: int

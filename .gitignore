@@ -55,5 +55,4 @@ pgdata/
 docker-compose.override.yml
 
 # Alembic
-# Не игнорируй alembic/versions/, если это миграции проекта
 # alembic/versions/
