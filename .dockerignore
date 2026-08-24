@@ -39,7 +39,7 @@ README.md
 *.sqlite3
 *.db
 
-# Docker files (если не нужны внутри образа)
+# Docker files 
 docker-compose.yml
 
 # Node (если есть frontend)

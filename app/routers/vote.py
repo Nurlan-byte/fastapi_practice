@@ -40,7 +40,7 @@ def vote(
         add_vote = models.Vote(user_id=current_user.id, post_id=new_vote.post_id)
         db.add(add_vote)
         db.commit()
-        return {"message": "succesfully added vote"}
+        return {"message": "successfully added vote"}
     else:
         if vote == None:
             raise HTTPException(
@@ -49,4 +49,4 @@ def vote(
 
         db.delete(vote)
         db.commit()
-        return {"message": "succesfully deleted vote"}
+        return {"message": "successfully deleted vote"}
