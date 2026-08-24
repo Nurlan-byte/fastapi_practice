@@ -18,7 +18,10 @@ pip install -r requirements.txt
 cp .env.example .env                               # fill in before starting
 alembic upgrade head
 uvicorn app.main:app --reload
-pytest                                             # tests
+
+# tests (needs a separate database)
+docker compose -f docker-compose-dev.yml exec postgres createdb -U postgres fastapi_test
+pytest
 ```
 
 Swagger UI at http://127.0.0.1:8000/docs lists every endpoint and lets you call
